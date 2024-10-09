@@ -1,0 +1,282 @@
+
+import { useEffect, useState } from "react";
+import { Form, Button, Container, Row, Col, Card, Modal } from "react-bootstrap";
+import swal from "sweetalert2";
+
+const LoginPage = () => {
+
+    const [ workouts, setWorkouts ] = useState([]);
+    const [ showModal, setShowModal ] = useState(false);
+    const [ showUpdateModal, setShowUpdateModal ] = useState(false);
+    const [ selectedId, setSelectedId] = useState('');
+    const [ newWorkoutName, setNewWorkoutName] = useState('');
+    const [ newWorkoutDuration, setNewWorkoutDuration] = useState('');
+    const [ isChanged, setIsChanged ] = useState(false);
+
+    const url = process.env.API_SERVER_URL || "https://fitnessapp-api-ln8u.onrender.com";
+
+
+    const fetchWorkouts = () => {
+
+         fetch(`${url}/workouts/getMyWorkouts`, {
+             headers: {
+                Authorization: `Bearer ${ localStorage.getItem('token') }`,
+                "Content-Type": "application/json",
+            }
+         })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.message === 'No Workouts found.') {
+                setWorkouts(<h3>NO WORKOUTS FOUND</h3>)
+            } else {
+
+                const workoutItems = data.workouts.map(item => {
+                    return (
+                        <Col className="d-flex justify-conent-center m-2" key={item._id}>
+                        <Card style={{ width: '18rem' }}>
+                            <Card.Body>
+                              <Card.Title>{item.name}</Card.Title>
+                              <Card.Subtitle className="mb-2 text-muted">{item.duration}</Card.Subtitle>
+                              <Card.Subtitle className="text-secondary">{item.status}</Card.Subtitle>
+                              <Row className="m-1">
+                                <Button className="flex-grow my-2 btn btn-success" onClick={() => handleCompleteWorkout(item._id)}>Mark Complete</Button>
+                                <Button className="flex-shrink my-1 bytn btn-primary" onClick={() => handleUpdateWorkout(item._id, item)}>Update</Button>
+                                <Button className="flex-shrink btn btn-danger" onClick={() => handleDeleteWorkout(item._id)}>Delete</Button>
+                              </Row>
+                            </Card.Body>
+                        </Card>
+                        </Col>
+                    )
+                })
+                setWorkouts(workoutItems)
+            }
+        })
+    }
+
+    const handleCreateWorkout = () => {
+         fetch(`${url}/workouts/addWorkout`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${ localStorage.getItem('token') }`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: newWorkoutName,
+                duration: newWorkoutDuration
+            })
+         })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                swal.fire({
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'Error adding workout',
+                });
+            } else {
+                swal.fire({
+                    title: 'Success',
+                    icon: 'success',
+                    text: 'Workout created successfully!',
+                });
+            }
+            setIsChanged(true);
+            setShowModal(false);
+            setNewWorkoutName('');
+            setNewWorkoutDuration('');
+        })
+    }
+
+    const handleUpdateWorkout = (id, workout) => {
+        setSelectedId(id);
+        setNewWorkoutName(workout.name)
+        setNewWorkoutDuration(workout.duration)
+        setShowUpdateModal(true);
+    }
+
+    const handleSaveUpdateWorkout = () => {
+          fetch(`${url}/workouts/updateWorkout/${selectedId}`, {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${ localStorage.getItem('token') }`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: newWorkoutName,
+                duration: newWorkoutDuration
+            })
+         })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                swal.fire({
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'Error adding workout',
+                });
+            } else {
+                swal.fire({
+                    title: 'Success',
+                    icon: 'success',
+                    text: 'Workout updated successfully!',
+                });
+            }
+            setIsChanged(true);
+            setShowUpdateModal(false);
+            setNewWorkoutName('');
+            setNewWorkoutDuration('');
+        })
+    }
+
+    const handleCompleteWorkout = (id) => {
+        console.log(id)
+         fetch(`${url}/workouts/completeWorkoutStatus/${id}`, {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${ localStorage.getItem('token') }`,
+                "Content-Type": "application/json",
+            },
+         })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                swal.fire({
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'Error saving workout',
+                });
+            } else {
+                swal.fire({
+                    title: 'Success',
+                    icon: 'success',
+                    text: 'Workout completed!',
+                });
+            }
+            setIsChanged(true)
+        })
+    }
+
+      const handleDeleteWorkout = (id) => {
+        console.log(id)
+         fetch(`${url}/workouts/deleteWorkout/${id}`, {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${ localStorage.getItem('token') }`,
+                "Content-Type": "application/json",
+            },
+         })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                swal.fire({
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'Error deleting workout',
+                });
+            } else {
+                swal.fire({
+                    title: 'Success',
+                    icon: 'success',
+                    text: 'Workout deleted!',
+                });
+            }
+            setIsChanged(true)
+        })
+    }
+
+    useEffect(() => {
+        fetchWorkouts();
+        setIsChanged(false)
+    }, [isChanged])
+
+    return (
+        <>
+        <Container>
+            <h1>My Workouts</h1>
+            <Row>
+                <Button className="btn btn-primary mb-3" variant="primary" onClick={() => setShowModal(true)}>Add</Button>
+            </Row>
+            <Row>
+
+                {workouts}
+            </Row>
+        </Container>
+
+        <Modal show={showUpdateModal} onHide={() => setShowUpdateModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Update Workout</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newWorkoutName}
+                                onChange={(e) => setNewWorkoutName(e.target.value)}
+                                maxLength={80}
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Duration in Minutes</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newWorkoutDuration}
+                                onChange={(e) => setNewWorkoutDuration(e.target.value)}
+                                maxLength={80}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveUpdateWorkout}>
+                        Update
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+        {/* ADD MODAL */}
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add New Workout</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newWorkoutName}
+                                onChange={(e) => setNewWorkoutName(e.target.value)}
+                                maxLength={80}
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Duration in Minutes</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newWorkoutDuration}
+                                onChange={(e) => setNewWorkoutDuration(e.target.value)}
+                                maxLength={80}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleCreateWorkout}>
+                        Add
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+export default LoginPage;
