@@ -33,16 +33,18 @@ const LoginPage = () => {
 
                 const workoutItems = data.workouts.map(item => {
                     return (
-                        <Col className="d-flex justify-conent-center m-2" key={item._id}>
-                        <Card style={{ width: '18rem' }}>
+                        <Col className="d-flex justify-content-center my-3 col-12 col-md-6 col-lg-4" key={item._id}>
+                        <Card style={{width:'300px', minWidth:'300px' }}>
                             <Card.Body>
                               <Card.Title>{item.name}</Card.Title>
                               <Card.Subtitle className="mb-2 text-muted">{item.duration}</Card.Subtitle>
                               <Card.Subtitle className="text-secondary">{item.status}</Card.Subtitle>
                               <Row className="m-1">
-                                <Button className="flex-grow my-2 btn btn-success" onClick={() => handleCompleteWorkout(item._id)}>Mark Complete</Button>
-                                <Button className="flex-shrink my-1 bytn btn-primary" onClick={() => handleUpdateWorkout(item._id, item)}>Update</Button>
-                                <Button className="flex-shrink btn btn-danger" onClick={() => handleDeleteWorkout(item._id)}>Delete</Button>
+                                <Button className="my-2" variant="outline-success" onClick={() => handleCompleteWorkout(item._id)}>Mark Complete</Button>
+                              </Row>
+                              <Row className="m-1">
+                                <Button className="col-6" variant="outline-info" onClick={() => handleUpdateWorkout(item._id, item)}>Update</Button>
+                                <Button className="col-6" variant="outline-danger" onClick={() => handleDeleteWorkout(item._id)}>Delete</Button>
                               </Row>
                             </Card.Body>
                         </Card>
@@ -192,13 +194,13 @@ const LoginPage = () => {
 
     return (
         <>
-        <Container>
-            <h1>My Workouts</h1>
-            <Row>
-                <Button className="btn btn-primary mb-3" variant="primary" onClick={() => setShowModal(true)}>Add</Button>
-            </Row>
-            <Row>
-
+        <Container className="">
+            <h2 className="fw-bold">My Workouts</h2>
+            <div className="d-flex" style={{justifyContent:'start', alignItems:'center'}}>
+                <Button className="btn text-white" style={{width:'90px', backgroundColor:'#653fc0',border:'1px solid #653fc0'}} onClick={() => setShowModal(true)}>Add</Button>
+            </div>
+            <hr/>
+            <Row className="justify-content-center">
                 {workouts}
             </Row>
         </Container>
@@ -270,7 +272,7 @@ const LoginPage = () => {
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleCreateWorkout}>
+                    <Button variant="success" onClick={handleCreateWorkout}>
                         Add
                     </Button>
                 </Modal.Footer>

@@ -63,24 +63,26 @@ const LoginPage = () => {
         <>
             <Container className="flex">
                 <Row className="justify-content-center">
-                    <Card className="m-5">
+                    <Card className="m-5 p-0 shadow" style={{width:'400px'}}>
+                        <card className="rounded-top" style={{height:'30px', backgroundColor: '#653fc0'}}></card>
                         <Form onSubmit={authenticate} className="p-5">
-                            <h1 className="">Login</h1>
-                            <Form.Group>
-                                <Form.Label>Email</Form.Label>
+                            <h2 className="fw-bold">Login</h2>
+                            <hr />
+                            <Form.Group className="my-2">
+                                <Form.Label className="fw-bold">Email</Form.Label>
                                 <Form.Control
                                     type="email"
-                                    placeholder="Enter email"
+                                    placeholder="email"
 	        	                    value={email}
             				        onChange={(e) => setEmail(e.target.value)}
 	        	                    required
                                 />
                             </Form.Group>
-                            <Form.Group>
-                                <Form.Label>Email</Form.Label>
+                            <Form.Group className="my-2">
+                                <Form.Label className="fw-bold">Password</Form.Label>
                                 <Form.Control
                                     type="password"
-	        	                    placeholder="Enter password"
+	        	                    placeholder="password"
 	        	                    value={password}
             				        onChange={(e) => setPassword(e.target.value)}
 	        	                    required
@@ -88,12 +90,12 @@ const LoginPage = () => {
                             </Form.Group>
 
                              { isActive ?
-	        	                <Button variant="primary" type="submit" id="submitBtn" className="mt-3 w-100">
-	        	                    Submit
+	        	                <Button type="submit" id="submitBtn" className="text-white mt-3 w-100" style={{backgroundColor: '#653fc0'}}>
+	        	                    Login
 	        	                </Button>
 	        	                 :
 	        	                <Button variant="secondary" type="submit" id="submitBtn" disabled className="mt-3 w-100">
-	        	                    Submit
+	        	                    Login
 	        	                </Button>
 	        	            }
 					            <p className="text-center mt-3">
