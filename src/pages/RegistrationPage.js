@@ -15,7 +15,7 @@ const RegistrationPage = () => {
     const register = (e) => {
         e.preventDefault();
 
-        const url = process.env.REACT_APP_URL || "https://fitnessapp-api-ln8u.onrender.com";
+        const url = process.env.REACT_APP_API_BASE_URL;
 
         fetch(`${url}/users/register`, {
 			method: 'POST',

@@ -13,7 +13,7 @@ const LoginPage = () => {
     const [ isActive, setIsActive ] = useState(false);
 
     const navigate = useNavigate();
-    const url = process.env.REACT_APP_API_URL || "https://fitnessapp-api-ln8u.onrender.com";
+    const url = process.env.REACT_APP_API_BASE_URL;
 
     const authenticate = (e) => {
         e.preventDefault();

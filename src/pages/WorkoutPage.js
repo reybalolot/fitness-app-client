@@ -17,7 +17,7 @@ const WorkoutPage = () => {
     const [ isChanged, setIsChanged ] = useState(false);
 
     const navigate = useNavigate()
-    const url = process.env.REACT_APP_URL || "https://fitnessapp-api-ln8u.onrender.com";
+    const url = process.env.REACT_APP_API_BASE_URL;
 
 
     const fetchWorkouts = () => {

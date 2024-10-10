@@ -15,7 +15,7 @@ function App() {
   const [user, setUser] = useState({id:null});
   const unsetUser = () => { localStorage.clear(); setUser({id:null})}
 
-  const url = process.env.REACT_APP_URL || "https://fitnessapp-api-ln8u.onrender.com";
+  const url = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     const token = localStorage.getItem('token');
