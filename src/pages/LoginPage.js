@@ -7,16 +7,17 @@ import UserContext from "../context/UserContext";
 
 const LoginPage = () => {
 
-    const { setUser } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
     const [ isActive, setIsActive ] = useState(false);
+
     const navigate = useNavigate();
+    const url = process.env.REACT_APP_API_URL || "https://fitnessapp-api-ln8u.onrender.com";
 
     const authenticate = (e) => {
         e.preventDefault();
 
-        const url = process.env.API_SERVER_URL || "https://fitnessapp-api-ln8u.onrender.com";
         fetch(`${url}/users/login`, {
 			method: 'POST',
 			headers: {
@@ -29,9 +30,10 @@ const LoginPage = () => {
 		})
 		.then(res => res.json())
 		.then(data => {
-			if (typeof data.access !== 'undefined') {
-
+			if (data.access) {
+                console.log("LOGIN")
                 localStorage.setItem('token', data.access);
+                getUserId(data.access)
                 navigate('/workout')
 
 			} else {
@@ -51,6 +53,23 @@ const LoginPage = () => {
 		});
     }
 
+    const getUserId = (token) => {
+
+      fetch(`${url}/workouts/getMyWorkouts`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.workouts[0].userId)
+        if (data.workouts) {
+          setUser({id:data.workouts[0].userId})
+          console.log(user)
+        }
+      })
+  }
+
     useEffect(() => {
         if (email !== '' && password !== '') {
             setIsActive(true);
@@ -64,7 +83,7 @@ const LoginPage = () => {
             <Container className="flex">
                 <Row className="justify-content-center">
                     <Card className="m-5 p-0 shadow" style={{width:'400px'}}>
-                        <card className="rounded-top" style={{height:'30px', backgroundColor: '#653fc0'}}></card>
+                        <div className="rounded-top" style={{height:'30px', backgroundColor: '#653fc0'}}></div>
                         <Form onSubmit={authenticate} className="p-5">
                             <h2 className="fw-bold">Login</h2>
                             <hr />

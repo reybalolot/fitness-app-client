@@ -5,6 +5,7 @@ import { UserProvider } from './context/UserContext';
 import WorkoutPage from './pages/WorkoutPage';
 import LoginPage from './pages/LoginPage';
 import NavigationBar from "./components/NavigationBar";
+import RegistrationPage from "./pages/RegistrationPage";
 import HomePage from "./pages/HomePage";
 
 import './App.css';
@@ -14,6 +15,31 @@ function App() {
   const [user, setUser] = useState({id:null});
   const unsetUser = () => { localStorage.clear(); setUser({id:null})}
 
+  const url = process.env.REACT_APP_URL || "https://fitnessapp-api-ln8u.onrender.com";
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      fetch(`${url}/workouts/getMyWorkouts`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.workouts) {
+
+          setUser({id:data.workouts[0].userId})
+          console.log(user)
+        } else {
+          setUser({id:null})
+        }
+      })
+    }
+  },[])
+
+
   return (
     <>
     <UserProvider value={{user, setUser, unsetUser}}>
@@ -21,8 +47,8 @@ function App() {
         <Container className="h-100">
         <NavigationBar/>
         <Routes>
-          <Route path="/" element={<LoginPage/>}/>
-          <Route path="/register" element={<WorkoutPage/>}/>
+          <Route path="/" element={<HomePage/>}/>
+          <Route path="/register" element={<RegistrationPage/>}/>
           <Route path="/login" element={<LoginPage/>}/>
           <Route path="/workout" element={<WorkoutPage/>}/>
         </Routes>

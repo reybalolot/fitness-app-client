@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
 import swal from "sweetalert2";
+import UserContext from "../context/UserContext";
 
 const RegistrationPage = () => {
+
+    const { user } = useContext(UserContext)
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
     const [ isActive, setIsActive ] = useState(false);
@@ -12,7 +15,7 @@ const RegistrationPage = () => {
     const register = (e) => {
         e.preventDefault();
 
-        const url = process.env.API_SERVER_URL || "https://fitnessapp-api-ln8u.onrender.com";
+        const url = process.env.REACT_APP_URL || "https://fitnessapp-api-ln8u.onrender.com";
 
         fetch(`${url}/users/register`, {
 			method: 'POST',
@@ -41,10 +44,11 @@ const RegistrationPage = () => {
                 })
             } else {
 				swal.fire({
-					title: "Registration failed",
-					icon: "error",
-					text: "Check your login details and try again."
+					title: "Registration successful",
+					icon: "success",
+					text: "Go ahead and login."
 				});
+                navigate('/login')
 			}
 		})
 		.catch(error => {
@@ -55,6 +59,13 @@ const RegistrationPage = () => {
 			});
 		});
     }
+
+    useEffect(() => {
+        if (user.id !== null) {
+            navigate('/workout')
+        }
+    })
+
 
     useEffect(() => {
         if (email !== '' && password !== '') {
@@ -68,24 +79,26 @@ const RegistrationPage = () => {
         <>
            <Container className="flex">
                 <Row className="justify-content-center">
-                    <Card className="m-5">
+                    <Card className="m-5 p-0 shadow" style={{width:'400px'}}>
+                        <div className="rounded-top" style={{height:'30px', backgroundColor: '#653fc0'}}></div>
                         <Form onSubmit={register} className="p-5">
-                            <h1 className="">Registration</h1>
-                            <Form.Group>
-                                <Form.Label>Email</Form.Label>
+                            <h2 className="fw-bold">Register</h2>
+                            <hr />
+                            <Form.Group className="my-2">
+                                <Form.Label className="fw-bold">Email</Form.Label>
                                 <Form.Control
                                     type="email"
-                                    placeholder="Enter email"
+                                    placeholder="email"
 	        	                    value={email}
             				        onChange={(e) => setEmail(e.target.value)}
 	        	                    required
                                 />
                             </Form.Group>
-                            <Form.Group>
-                                <Form.Label>Email</Form.Label>
+                            <Form.Group className="my-2">
+                                <Form.Label className="fw-bold">Password</Form.Label>
                                 <Form.Control
                                     type="password"
-	        	                    placeholder="Enter password"
+	        	                    placeholder="password"
 	        	                    value={password}
             				        onChange={(e) => setPassword(e.target.value)}
 	        	                    required
@@ -93,8 +106,8 @@ const RegistrationPage = () => {
                             </Form.Group>
 
                              { isActive ?
-	        	                <Button variant="primary" type="submit" id="submitBtn" className="mt-3 w-100">
-	        	                    Submit
+	        	                <Button type="submit" id="submitBtn" className="text-white mt-3 w-100" style={{backgroundColor: '#653fc0'}}>
+	        	                    Login
 	        	                </Button>
 	        	                 :
 	        	                <Button variant="secondary" type="submit" id="submitBtn" disabled className="mt-3 w-100">
@@ -102,7 +115,7 @@ const RegistrationPage = () => {
 	        	                </Button>
 	        	            }
 					            <p className="text-center mt-3">
-                    	            Don't have an account? Click <Link to="/register">here</Link> to register.
+                    	            or click <Link to="/login">here</Link> to login.
                 	            </p>
                         </Form>
                     </Card>

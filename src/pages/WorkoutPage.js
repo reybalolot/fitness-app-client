@@ -1,10 +1,13 @@
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Form, Button, Container, Row, Col, Card, Modal } from "react-bootstrap";
+import { useNavigate, Link } from "react-router-dom";
+import UserContext from '../context/UserContext';
 import swal from "sweetalert2";
 
-const LoginPage = () => {
+const WorkoutPage = () => {
 
+    const { user } = useContext(UserContext)
     const [ workouts, setWorkouts ] = useState([]);
     const [ showModal, setShowModal ] = useState(false);
     const [ showUpdateModal, setShowUpdateModal ] = useState(false);
@@ -13,7 +16,8 @@ const LoginPage = () => {
     const [ newWorkoutDuration, setNewWorkoutDuration] = useState('');
     const [ isChanged, setIsChanged ] = useState(false);
 
-    const url = process.env.API_SERVER_URL || "https://fitnessapp-api-ln8u.onrender.com";
+    const navigate = useNavigate()
+    const url = process.env.REACT_APP_URL || "https://fitnessapp-api-ln8u.onrender.com";
 
 
     const fetchWorkouts = () => {
@@ -160,7 +164,6 @@ const LoginPage = () => {
     }
 
       const handleDeleteWorkout = (id) => {
-        console.log(id)
          fetch(`${url}/workouts/deleteWorkout/${id}`, {
             method: 'PATCH',
             headers: {
@@ -187,13 +190,32 @@ const LoginPage = () => {
         })
     }
 
+
     useEffect(() => {
-        fetchWorkouts();
-        setIsChanged(false)
+        console.log(user.id)
+        if (user.id === null) {
+            // navigate('/login')
+        } else {
+            fetchWorkouts();
+        }
+    },[user])
+
+    useEffect(() => {
+        if(user.id !== null) {
+            fetchWorkouts();
+            setIsChanged(false)
+        }
     }, [isChanged])
 
     return (
         <>
+        {user.id === null ? (
+             <p className="text-center mt-3">
+             You've been logged out. Go to <Link to="/login">login</Link>.
+            </p>
+    ) : (
+            <>
+
         <Container className="">
             <h2 className="fw-bold">My Workouts</h2>
             <div className="d-flex" style={{justifyContent:'start', alignItems:'center'}}>
@@ -277,8 +299,10 @@ const LoginPage = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            </>
+        )}
         </>
     )
 }
 
-export default LoginPage;
+export default WorkoutPage;
